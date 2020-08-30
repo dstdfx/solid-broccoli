@@ -149,6 +149,6 @@ func TestGetPositions_BadOrderByField(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 	assert.Equal(t,
 		testutils.RespToJSON(t,
-			"{\"error\":\"positions can't be ordered by 'wwwwat' field\"}",
+			map[string]string{"error": "positions can't be ordered by 'wwwwat' field"},
 		), w.Body.String())
 }
