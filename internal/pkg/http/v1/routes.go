@@ -9,11 +9,11 @@ import (
 )
 
 const (
-	summaryURL   = "summary"
-	positionsURL = "positions"
+	summaryURL   = "/summary"
+	positionsURL = "/positions"
 )
 
-// Routes initializes v1 handler
+// Routes initializes v1 handler.
 func Routes(log *zap.Logger, b *backend.Backend) http.Handler {
 	r := chi.NewRouter()
 	// TODO: add request-id middleware
@@ -21,17 +21,20 @@ func Routes(log *zap.Logger, b *backend.Backend) http.Handler {
 
 	r.Get(summaryURL, summaryHandler(b))
 	r.Get(positionsURL, positionsHandler(b))
+
 	return r
 }
 
 func summaryHandler(b *backend.Backend) func(w http.ResponseWriter, req *http.Request) {
 	return func(w http.ResponseWriter, req *http.Request) {
 		// TODO: implement me
+		w.WriteHeader(http.StatusNotImplemented)
 	}
 }
 
 func positionsHandler(b *backend.Backend) func(w http.ResponseWriter, req *http.Request) {
 	return func(w http.ResponseWriter, req *http.Request) {
 		// TODO: implement me
+		w.WriteHeader(http.StatusNotImplemented)
 	}
 }

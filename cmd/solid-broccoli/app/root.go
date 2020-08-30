@@ -5,7 +5,7 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/dstdfx/solid-broccoli/internal/app/solidbroccoli"
+	sb "github.com/dstdfx/solid-broccoli/internal/app/solidbroccoli"
 	"github.com/dstdfx/solid-broccoli/internal/pkg/config"
 	"github.com/dstdfx/solid-broccoli/internal/pkg/log"
 	"github.com/spf13/cobra"
@@ -48,7 +48,7 @@ var RootCmd = &cobra.Command{
 		}
 
 		// Start main routine
-		if err := solidbroccoli.StartService(logger); err != nil {
+		if err := sb.StartService(logger, sb.StartOpts{Interrupt: make(chan os.Signal, 1)}); err != nil {
 			exitWithErr(fmt.Errorf("error starting solidbroccoli app: %w", err))
 		}
 	},

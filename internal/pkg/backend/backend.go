@@ -18,7 +18,7 @@ type Backend struct {
 }
 
 // New init new Backend instance.
-func (b *Backend) New(log *zap.Logger) (*Backend, error) {
+func New(log *zap.Logger) (*Backend, error) {
 	// Init DB connection
 	conn, err := sqlx.Connect("sqlite3", config.Config.DB.DSN)
 	if err != nil {
