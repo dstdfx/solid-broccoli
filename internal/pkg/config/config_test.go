@@ -18,6 +18,8 @@ public_api:
   read_timeout: 15
   write_timeout: 20
   idle_timeout: 30
+db:
+  dsn: test_possitions.db
 service_api:
   server_address: localhost
   server_port: 63101
@@ -42,6 +44,9 @@ sentry:
 			ReadTimeout:   15,
 			WriteTimeout:  20,
 			IdleTimeout:   30,
+		},
+		DB: DBConfig{
+			DSN: "test_possitions.db",
 		},
 		ServiceAPI: ServiceAPIServerConfig{
 			ServerAddress: "localhost",
@@ -73,6 +78,9 @@ func TestConfigInitFromStringDefaultValues(t *testing.T) {
 			ReadTimeout:   60,
 			WriteTimeout:  120,
 			IdleTimeout:   240,
+		},
+		DB: DBConfig{
+			DSN: "possitions.db",
 		},
 		ServiceAPI: ServiceAPIServerConfig{
 			ServerAddress: "127.0.0.1",

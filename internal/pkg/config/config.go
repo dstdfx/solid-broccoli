@@ -21,6 +21,8 @@ const (
 	defaultHTTPReadTimeout  = 60
 	defaultHTTPWriteTimeout = 120
 	defaultHTTPIdleTimeout  = 240
+
+	defaultSQliteDSN = "possitions.db"
 )
 
 // Config is a global container for all configuration options.
@@ -30,6 +32,7 @@ var Config *AppConfig
 type AppConfig struct {
 	Log        LogConfig              `yaml:"log"`
 	PublicAPI  PublicAPIServerConfig  `yaml:"public_api"`
+	DB         DBConfig               `yaml:"db"`
 	ServiceAPI ServiceAPIServerConfig `yaml:"service_api"`
 	Sentry     SentryConfig           `yaml:"sentry"`
 }
@@ -57,6 +60,11 @@ type ServiceAPIServerConfig struct {
 	ReadTimeout   int    `yaml:"read_timeout"`
 	WriteTimeout  int    `yaml:"write_timeout"`
 	IdleTimeout   int    `yaml:"idle_timeout"`
+}
+
+// DBConfig contains DB-related configuration.
+type DBConfig struct {
+	DSN string `yaml:"dsn"`
 }
 
 // SentryConfig contains sentry specific configuration.
@@ -104,6 +112,7 @@ func initFromString(data []byte) error {
 	defaultStringParameters := map[*string]string{
 		&Config.PublicAPI.ServerAddress:  defaultPublicAPIAddress,
 		&Config.ServiceAPI.ServerAddress: defaultServiceAPIAddress,
+		&Config.DB.DSN:                   defaultSQliteDSN,
 	}
 	for currentValue, defaultValue := range defaultStringParameters {
 		setDefaultStringValue(currentValue, defaultValue)
