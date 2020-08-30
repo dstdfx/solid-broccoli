@@ -4,23 +4,39 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"time"
 
 	"go.uber.org/zap"
 )
 
-const getSummeryQuery = `SELECT COUNT(1) FROM positions WHERE domain = $1`
+const (
+	getSummaryQuery = `SELECT COUNT(1) FROM positions WHERE domain = $1`
+
+	getPositionsQuery = `SELECT
+				keyword,
+				position,
+				url,
+				volume,
+				results,
+				cpc,
+				updated
+		FROM positions
+		WHERE domain = $1
+		ORDER BY %s ASC
+		LIMIT $2 OFFSET $3
+`
+)
 
 // Position represents a single domain's position.
 type Position struct {
-	Domain   string     `db:"domain"`
-	URL      string     `db:"keyword"`
-	Position int        `db:"position"`
-	Keyword  string     `db:"keyword"`
-	Volume   int        `db:"volume"`
-	Results  int        `db:"results"`
-	CPC      float64    `db:"cpc"`
-	Updated  *time.Time `db:"datetime"`
+	URL      string     `db:"url" json:"url"`
+	Position int        `db:"position" json:"position"`
+	Keyword  string     `db:"keyword" json:"keyword"`
+	Volume   int        `db:"volume" json:"volume"`
+	Results  int        `db:"results" json:"results"`
+	CPC      float64    `db:"cpc" json:"cpc"`
+	Updated  *time.Time `db:"updated" json:"updated"`
 }
 
 // DomainSummary represents a total number of positions for domain.
@@ -31,7 +47,7 @@ type DomainSummary struct {
 
 // GetSummary returns a total number of positions for the given domain.
 func (pr *PositionRepo) GetSummary(ctx context.Context, domain string) (*DomainSummary, error) {
-	row := pr.conn.QueryRowxContext(ctx, getSummeryQuery, domain)
+	row := pr.conn.QueryRowxContext(ctx, getSummaryQuery, domain)
 	err := row.Err()
 	if err != nil {
 		if errors.Is(row.Err(), sql.ErrNoRows) {
@@ -46,11 +62,58 @@ func (pr *PositionRepo) GetSummary(ctx context.Context, domain string) (*DomainS
 	if err := row.Scan(&positionsCount); err != nil {
 		pr.log.Error("failed to scan positions count", zap.Error(err))
 
-		return nil, err
+		return nil, fmt.Errorf("failed to scan positions count: %w", err)
 	}
 
 	return &DomainSummary{
 		Domain:         domain,
 		PositionsCount: positionsCount,
 	}, nil
+}
+
+// GetPositions returns a slice of positions for the given domain.
+func (pr *PositionRepo) GetPositions(ctx context.Context, domain, orderBy string, limit, offset int) ([]*Position, error) {
+	// Set default order in case if empty is given
+	if orderBy == "" {
+		orderBy = "volume"
+	}
+
+	rows, err := pr.conn.QueryContext(ctx,
+		fmt.Sprintf(getPositionsQuery, orderBy),
+		domain,
+		limit,
+		offset,
+	)
+	if err != nil {
+		pr.log.Error("failed to execute query", zap.Error(err))
+
+		return nil, fmt.Errorf("failed to execute query: %w", err)
+	}
+	defer rows.Close()
+
+	positions := make([]*Position, 0, limit)
+
+	for rows.Next() {
+		p := &Position{}
+		if err := rows.Scan(&p.Keyword,
+			&p.Position,
+			&p.URL,
+			&p.Volume,
+			&p.Results,
+			&p.CPC,
+			&p.Updated); err != nil {
+			pr.log.Error("failed to scan position", zap.Error(err))
+
+			return nil, fmt.Errorf("failed to scan position: %w", err)
+		}
+		positions = append(positions, p)
+	}
+
+	if err := rows.Err(); err != nil {
+		pr.log.Error("failed to execute query", zap.Error(err))
+
+		return nil, fmt.Errorf("failed to execute query: %w", err)
+	}
+
+	return positions, nil
 }
