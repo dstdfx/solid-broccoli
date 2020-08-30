@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"time"
 
 	"go.uber.org/zap"
 )
@@ -20,7 +19,7 @@ const (
 				volume,
 				results,
 				cpc,
-				updated
+				date(updated, 'unixepoch')
 		FROM positions
 		WHERE domain = $1
 		ORDER BY %s ASC
@@ -30,13 +29,13 @@ const (
 
 // Position represents a single domain's position.
 type Position struct {
-	URL      string     `db:"url" json:"url"`
-	Position int        `db:"position" json:"position"`
-	Keyword  string     `db:"keyword" json:"keyword"`
-	Volume   int        `db:"volume" json:"volume"`
-	Results  int        `db:"results" json:"results"`
-	CPC      float64    `db:"cpc" json:"cpc"`
-	Updated  *time.Time `db:"updated" json:"updated"`
+	URL      string  `db:"url" json:"url"`
+	Position int     `db:"position" json:"position"`
+	Keyword  string  `db:"keyword" json:"keyword"`
+	Volume   int     `db:"volume" json:"volume"`
+	Results  int     `db:"results" json:"results"`
+	CPC      float64 `db:"cpc" json:"cpc"`
+	Updated  string  `db:"updated" json:"updated"`
 }
 
 // DomainSummary represents a total number of positions for domain.
