@@ -80,7 +80,7 @@ func TestConfigInitFromStringDefaultValues(t *testing.T) {
 			IdleTimeout:   240,
 		},
 		DB: DBConfig{
-			DSN: "positions.db",
+			DSN: "data/positions.db",
 		},
 		ServiceAPI: ServiceAPIServerConfig{
 			ServerAddress: "127.0.0.1",
