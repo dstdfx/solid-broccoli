@@ -22,7 +22,7 @@ const (
 	defaultHTTPWriteTimeout = 120
 	defaultHTTPIdleTimeout  = 240
 
-	defaultSQliteDSN = "possitions.db"
+	defaultSQliteDSN = "positions.db"
 )
 
 // Config is a global container for all configuration options.

@@ -3,6 +3,10 @@ github.com/davecgh/go-spew/spew
 # github.com/go-chi/chi v4.1.2+incompatible
 ## explicit
 github.com/go-chi/chi
+github.com/go-chi/chi/middleware
+# github.com/gofrs/uuid v3.3.0+incompatible
+## explicit
+github.com/gofrs/uuid
 # github.com/inconshreveable/mousetrap v1.0.0
 github.com/inconshreveable/mousetrap
 # github.com/jmoiron/sqlx v1.2.0

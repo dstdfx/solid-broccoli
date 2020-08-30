@@ -5,6 +5,7 @@ import (
 
 	"github.com/dstdfx/solid-broccoli/internal/pkg/backend"
 	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
 	"go.uber.org/zap"
 )
 
@@ -15,10 +16,11 @@ const (
 
 // Routes initializes v1 handler.
 func Routes(log *zap.Logger, b *backend.Backend) http.Handler {
-	r := chi.NewRouter()
-	// TODO: add request-id middleware
-	// TODO: add request logger
-
+	r := chi.NewRouter().
+		With(middleware.Recoverer).
+		With(SetRequestID(log)).
+		With(RequestLogger(log)).
+		With(SetContextLogger(log))
 	r.Get(summaryURL, summaryHandler(b))
 	r.Get(positionsURL, positionsHandler(b))
 
