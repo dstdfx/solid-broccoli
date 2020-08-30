@@ -7,6 +7,7 @@ import (
 
 	"github.com/dstdfx/solid-broccoli/internal/app/solidbroccoli"
 	"github.com/dstdfx/solid-broccoli/internal/pkg/config"
+	"github.com/dstdfx/solid-broccoli/internal/pkg/log"
 	"github.com/spf13/cobra"
 )
 
@@ -36,10 +37,18 @@ var RootCmd = &cobra.Command{
 			exitWithErr(err)
 		}
 
-		// TODO: init logging
+		// Init logger
+		logger, err := log.InitLogger(log.InitLoggerOpts{
+			File:      config.Config.Log.File,
+			UseStdout: config.Config.Log.UseStdout,
+			Debug:     config.Config.Log.Debug,
+		})
+		if err != nil {
+			exitWithErr(err)
+		}
 
 		// Start main routine
-		if err := solidbroccoli.StartService(); err != nil {
+		if err := solidbroccoli.StartService(logger); err != nil {
 			exitWithErr(fmt.Errorf("error starting solidbroccoli app: %w", err))
 		}
 	},

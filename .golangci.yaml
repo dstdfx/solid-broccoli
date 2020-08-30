@@ -17,6 +17,7 @@ linters:
     - maligned
     - goerr113
     - testpackage
+    - gomnd
 linters-settings:
   gocyclo:
     min-complexity: 34
