@@ -18,6 +18,8 @@ linters:
     - goerr113
     - testpackage
     - gomnd
+    - noctx
+    - gci
 linters-settings:
   gocyclo:
     min-complexity: 34

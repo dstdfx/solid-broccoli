@@ -48,7 +48,7 @@ func summaryHandler(b *backend.Backend) func(w http.ResponseWriter, req *http.Re
 		domain := GetDomainName(req.Context())
 
 		repo := db.NewPositionRepo(log, b.DB)
-		domainSummary, err := repo.GetSummary(req.Context(), domain)
+		summary, err := repo.GetSummary(req.Context(), domain)
 		if err != nil {
 			log.Error("failed to get summary", zap.Error(err))
 			http.Error(w, "", http.StatusInternalServerError)
@@ -56,17 +56,16 @@ func summaryHandler(b *backend.Backend) func(w http.ResponseWriter, req *http.Re
 			return
 		}
 
-		// TODO: write swagger models
 		w.WriteHeader(http.StatusOK)
-		JSON(w, newSummaryResponse(domainSummary))
+		JSON(w, NewSummaryResponse(domain, summary))
 	}
 }
 
-func newSummaryResponse(ds *db.DomainSummary) interface{} {
+func NewSummaryResponse(domain string, positions int) interface{} {
 	return struct {
 		Domain         string `json:"domain"`
 		PositionsCount int    `json:"positions_count"`
-	}{Domain: ds.Domain, PositionsCount: ds.PositionsCount}
+	}{Domain: domain, PositionsCount: positions}
 }
 
 func positionsHandler(b *backend.Backend) func(w http.ResponseWriter, req *http.Request) {
@@ -96,8 +95,6 @@ func positionsHandler(b *backend.Backend) func(w http.ResponseWriter, req *http.
 			return
 		}
 
-		log.Debug("page num is ", zap.Int("page num", pageNum))
-
 		// Init repository and query domain's positions
 		repo := db.NewPositionRepo(log, b.DB)
 		positions, err := repo.GetPositions(
@@ -115,11 +112,11 @@ func positionsHandler(b *backend.Backend) func(w http.ResponseWriter, req *http.
 
 		// Write response
 		w.WriteHeader(http.StatusOK)
-		JSON(w, newPositionsResponse(domain, positions))
+		JSON(w, NewPositionsResponse(domain, positions))
 	}
 }
 
-func newPositionsResponse(domain string, positions []*db.Position) interface{} {
+func NewPositionsResponse(domain string, positions []*db.Position) interface{} {
 	return struct {
 		Domain    string         `json:"domain"`
 		Positions []*db.Position `json:"positions"`

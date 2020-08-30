@@ -11,8 +11,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const testDomain = "ulmart.ru"
-
 func TestGetSummary(t *testing.T) {
 	// Check acceptance test flag
 	if !testutils.IsAccTestEnabled(t) {
@@ -38,16 +36,13 @@ func TestGetSummary(t *testing.T) {
 	testutils.PrepareDB(t, b.DB)
 	defer testutils.TeardownDB(t, b.DB)
 
-	expectedSummary := &DomainSummary{
-		Domain:         testDomain,
-		PositionsCount: 3,
-	}
+	expectedCount := 3
 
 	repo := NewPositionRepo(logger, b.DB)
-	got, err := repo.GetSummary(context.Background(), testDomain)
+	got, err := repo.GetSummary(context.Background(), testutils.TestDomain)
 	assert.NoError(t, err)
 	assert.NotNil(t, got)
-	assert.Equal(t, expectedSummary, got)
+	assert.Equal(t, expectedCount, got)
 }
 
 func TestGetPositions_DefaultOrder(t *testing.T) {
@@ -77,7 +72,7 @@ func TestGetPositions_DefaultOrder(t *testing.T) {
 
 	repo := NewPositionRepo(logger, b.DB)
 	// Query positions with default order by "volume"
-	got, err := repo.GetPositions(context.Background(), testDomain, "", 1, 0)
+	got, err := repo.GetPositions(context.Background(), testutils.TestDomain, "", 1, 0)
 	assert.NoError(t, err)
 	assert.NotNil(t, got)
 	assert.Len(t, got, 1)
@@ -85,19 +80,19 @@ func TestGetPositions_DefaultOrder(t *testing.T) {
 	assert.Equal(t, 43, got[0].Volume)
 
 	// Query next chunk with offset
-	got, err = repo.GetPositions(context.Background(), testDomain, "", 1, 1)
+	got, err = repo.GetPositions(context.Background(), testutils.TestDomain, "", 1, 1)
 	assert.NoError(t, err)
 	assert.NotNil(t, got)
 	assert.Len(t, got, 1)
 
 	// Query the last chunk with offset
-	got, err = repo.GetPositions(context.Background(), testDomain, "", 1, 2)
+	got, err = repo.GetPositions(context.Background(), testutils.TestDomain, "", 1, 2)
 	assert.NoError(t, err)
 	assert.NotNil(t, got)
 	assert.Len(t, got, 1)
 
 	// Check that nothing is left after offset 3
-	got, err = repo.GetPositions(context.Background(), testDomain, "", 1, 3)
+	got, err = repo.GetPositions(context.Background(), testutils.TestDomain, "", 1, 3)
 	assert.NoError(t, err)
 	assert.Empty(t, got)
 
@@ -131,25 +126,25 @@ func TestGetPositions_OrderByCPC(t *testing.T) {
 
 	repo := NewPositionRepo(logger, b.DB)
 	// Query positions with default order by "volume"
-	got, err := repo.GetPositions(context.Background(), testDomain, "cpc", 1, 0)
+	got, err := repo.GetPositions(context.Background(), testutils.TestDomain, "cpc", 1, 0)
 	assert.NoError(t, err)
 	assert.NotNil(t, got)
 	assert.Len(t, got, 1)
 
 	// Query next chunk with offset
-	got, err = repo.GetPositions(context.Background(), testDomain, "cpc", 1, 1)
+	got, err = repo.GetPositions(context.Background(), testutils.TestDomain, "cpc", 1, 1)
 	assert.NoError(t, err)
 	assert.NotNil(t, got)
 	assert.Len(t, got, 1)
 
 	// Query the last chunk with offset
-	got, err = repo.GetPositions(context.Background(), testDomain, "cpc", 1, 2)
+	got, err = repo.GetPositions(context.Background(), testutils.TestDomain, "cpc", 1, 2)
 	assert.NoError(t, err)
 	assert.NotNil(t, got)
 	assert.Len(t, got, 1)
 
 	// Check that nothing is left after offset 3
-	got, err = repo.GetPositions(context.Background(), testDomain, "cpc", 1, 3)
+	got, err = repo.GetPositions(context.Background(), testutils.TestDomain, "cpc", 1, 3)
 	assert.NoError(t, err)
 	assert.Empty(t, got)
 }

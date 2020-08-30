@@ -46,29 +46,26 @@ type DomainSummary struct {
 }
 
 // GetSummary returns a total number of positions for the given domain.
-func (pr *PositionRepo) GetSummary(ctx context.Context, domain string) (*DomainSummary, error) {
+func (pr *PositionRepo) GetSummary(ctx context.Context, domain string) (int, error) {
 	row := pr.conn.QueryRowxContext(ctx, getSummaryQuery, domain)
 	err := row.Err()
 	if err != nil {
 		if errors.Is(row.Err(), sql.ErrNoRows) {
-			return nil, err
+			return -1, err
 		}
 		pr.log.Error("failed to execute query", zap.Error(err))
 
-		return nil, err
+		return -1, err
 	}
 
 	var positionsCount int
 	if err := row.Scan(&positionsCount); err != nil {
 		pr.log.Error("failed to scan positions count", zap.Error(err))
 
-		return nil, fmt.Errorf("failed to scan positions count: %w", err)
+		return -1, fmt.Errorf("failed to scan positions count: %w", err)
 	}
 
-	return &DomainSummary{
-		Domain:         domain,
-		PositionsCount: positionsCount,
-	}, nil
+	return positionsCount, nil
 }
 
 // GetPositions returns a slice of positions for the given domain.

@@ -7,7 +7,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
 
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/mattn/go-sqlite3" // sqlite3 driver import
 )
 
 // Backend contains application connections to different external services and additional

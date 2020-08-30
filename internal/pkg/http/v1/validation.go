@@ -15,7 +15,7 @@ var validFieldsToOrderBy = map[string]struct{}{
 
 func validateOrderByField(orderBy string) error {
 	if _, ok := validFieldsToOrderBy[orderBy]; !ok {
-		return fmt.Errorf("positions can't be ordered by %s field", orderBy)
+		return fmt.Errorf("positions can't be ordered by '%s' field", orderBy)
 	}
 
 	return nil
