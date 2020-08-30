@@ -3,12 +3,14 @@ package v1
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"io/ioutil"
 	"net/http"
 	"strings"
 	"time"
 
+	"github.com/go-chi/chi"
 	chimiddleware "github.com/go-chi/chi/middleware"
 	"github.com/gofrs/uuid"
 	"go.uber.org/zap"
@@ -23,11 +25,16 @@ const (
 	XForwardedForHeader = "x-forwarded-for"
 )
 
+const (
+	domainNameParam = "domain_name"
+)
+
 type ctxKey int
 
 const (
 	ctxRequestID ctxKey = iota
 	ctxLogger
+	ctxDomainName
 )
 
 // SetRequestID middleware creates a new request ID and saves it into request context.
@@ -144,6 +151,45 @@ func GetContextLogger(ctx context.Context) (*zap.Logger, error) {
 	}
 
 	return nil, errors.New("no logger in request context")
+}
+
+// RequireDomainName middleware checks that 'domain' parameter is set and valid.
+func RequireDomainName(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		domainName := chi.URLParam(r, domainNameParam)
+		if domainName == "" {
+			w.WriteHeader(http.StatusBadRequest)
+			JSON(w, "domain_name is required")
+
+			return
+		}
+
+		ctx := context.WithValue(r.Context(), ctxDomainName, domainName)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
+// GetDomainName retrieves domain name value from context.
+func GetDomainName(ctx context.Context) string {
+	v, ok := ctx.Value(ctxDomainName).(string)
+	if !ok {
+		return ""
+	}
+
+	return v
+}
+
+// JSON marshals 'v' to JSON, automatically escaping HTML and setting the Content-Type as application/json.
+// It will call http.Error in case of failures.
+func JSON(w http.ResponseWriter, v interface{}) {
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+
+	enc := json.NewEncoder(w)
+	enc.SetEscapeHTML(true)
+
+	if err := enc.Encode(v); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 // requestGetRemoteAddress returns ip address of the client making the request, taking into account http proxies.
