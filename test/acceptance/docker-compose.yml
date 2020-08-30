@@ -1,0 +1,11 @@
+version: "3.5"
+services:
+  solid-broccoli:
+    image: golang:1.15
+    volumes:
+      - ../../:/solid-broccoli
+    working_dir: /solid-broccoli
+    environment:
+      ACC_TESTS:   "1"
+      GO111MODULE: "on"
+    command: bash -c "sleep 30 && go test -mod=vendor -timeout=60m -v --count=1 -p 1 ./..."
