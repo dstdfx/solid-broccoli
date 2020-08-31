@@ -132,7 +132,7 @@ go tool pprof http://127.0.0.1:63101/debug/pprof/profile
 
 You could also visit `http://127.0.0.1:63101/debug/pprof/` in your browser and do some profiling.
 
-It also has `/metrics` endpoint which provides Prometheus metrics.
+As well as that Service API has `/metrics` endpoint which provides Prometheus metrics.
 
 Example of fetching Prometheus metrics:
 ```bash
@@ -192,7 +192,7 @@ make tests
 Use the following command to run only unit-tests:
 
 ```sh
-make unittests
+make unittest
 ```
 
 ## Linters
