@@ -4,7 +4,7 @@ Simple Go application that provides HTTP API service
 
 ## Public API 
 
-- **/v1/summary/<domain-name>** - returns a count of positions for domain
+- `/v1/summary/<domain-name>` - returns a count of positions for domain
 
 Example:
 ```bash
@@ -15,7 +15,7 @@ curl -s -X GET "127.0.0.1:63100/v1/summary/fidel.net" | json_pp
 }
 ```
 
-- **/v1/positions/<domain-name>?orderBy=<field-to-order-by>&page=<page-number>** - returns a bunch of 
+- `/v1/positions/<domain-name>?orderBy=<field-to-order-by>&page=<page-number>` - returns a bunch of
 positions for domain 
 
 Example:
