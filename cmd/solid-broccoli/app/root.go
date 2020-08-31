@@ -11,7 +11,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const defaultCfgFile = "/etc/solidbroccoli/solidbroccoli.yaml"
+const defaultCfgFile = "/etc/solid-broccoli/solid-broccoli.yaml"
 
 var cfgFile string
 
@@ -26,8 +26,8 @@ var (
 
 // RootCmd represents the base command when called without any subcommands.
 var RootCmd = &cobra.Command{
-	Use:   "solidbroccoli",
-	Short: "solidbroccoli represents a simple HTTP API service t",
+	Use:   "solid-broccoli",
+	Short: "solid-broccoli represents a simple HTTP API service",
 	Run: func(_ *cobra.Command, _ []string) {
 		// Initialize application config and log.
 		if _, err := os.Stat(cfgFile); err != nil {
