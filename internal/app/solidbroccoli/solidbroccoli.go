@@ -12,9 +12,12 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/dstdfx/solid-broccoli/internal/app/exporter"
 	"github.com/dstdfx/solid-broccoli/internal/pkg/backend"
 	"github.com/dstdfx/solid-broccoli/internal/pkg/config"
 	public "github.com/dstdfx/solid-broccoli/internal/pkg/http"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.uber.org/zap"
 )
 
@@ -25,12 +28,18 @@ const (
 	pprofSymbolPath  = "/debug/pprof/symbol"
 	pprofTracePath   = "/debug/pprof/trace"
 
+	metricsPath = "/metrics"
+
 	gracefulShutdownTimeout = 5 * time.Second
 )
 
 // StartOpts represents options to be passed to main gorountine.
 type StartOpts struct {
-	Interrupt chan os.Signal
+	Interrupt      chan os.Signal
+	BuildGitCommit string
+	BuildGitTag    string
+	BuildDate      string
+	BuildCompiler  string
 }
 
 // StartService runs main service's goroutine.
@@ -48,8 +57,21 @@ func StartService(log *zap.Logger, opts StartOpts) error {
 	}
 	defer b.Shutdown()
 
+	// Register new Prometheus exporter
+	if err := prometheus.Register(exporter.NewAPIExporter(&exporter.NewAPIExporterOpts{
+		BuildGitCommit: opts.BuildGitCommit,
+		BuildGitTag:    opts.BuildGitTag,
+		BuildDate:      opts.BuildDate,
+		BuildCompiler:  opts.BuildCompiler,
+	})); err != nil {
+		return fmt.Errorf("failed to register prometheus exporter: %w", err)
+	}
+
 	// Register service API handler
 	httpMux := http.NewServeMux()
+
+	// Register prometheus handler
+	httpMux.Handle(metricsPath, promhttp.Handler())
 
 	// Register pprof handlers
 	httpMux.HandleFunc(pprofIndexPath, pprof.Index)

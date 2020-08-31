@@ -132,6 +132,17 @@ go tool pprof http://127.0.0.1:63101/debug/pprof/profile
 
 You could also visit `http://127.0.0.1:63101/debug/pprof/` in your browser and do some profiling.
 
+It also has `/metrics` endpoint which provides Prometheus metrics.
+
+Example of fetching Prometheus metrics:
+```bash
+curl -s -X GET 127.0.0.1:63101/metrics
+# HELP build_info Build information about the app.
+# TYPE build_info gauge
+build_info{build_date="",compiler="go1.15",git_commit="",git_tag=""} 1
+...
+```
+
 ## Build 
 
 Use the following command to build binary:

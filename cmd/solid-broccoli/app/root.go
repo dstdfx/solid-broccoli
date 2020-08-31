@@ -15,7 +15,6 @@ const defaultCfgFile = "/etc/solid-broccoli/solid-broccoli.yaml"
 
 var cfgFile string
 
-// nolint
 // Variables that are injected in build time.
 var (
 	buildGitCommit string
@@ -47,9 +46,17 @@ var RootCmd = &cobra.Command{
 			exitWithErr(err)
 		}
 
+		opts := sb.StartOpts{
+			Interrupt:      make(chan os.Signal, 1),
+			BuildGitCommit: buildGitCommit,
+			BuildGitTag:    buildGitTag,
+			BuildDate:      buildDate,
+			BuildCompiler:  buildCompiler,
+		}
+
 		// Start main routine
-		if err := sb.StartService(logger, sb.StartOpts{Interrupt: make(chan os.Signal, 1)}); err != nil {
-			exitWithErr(fmt.Errorf("error starting solidbroccoli app: %w", err))
+		if err := sb.StartService(logger, opts); err != nil {
+			exitWithErr(fmt.Errorf("error starting solid-broccoli app: %w", err))
 		}
 	},
 }
